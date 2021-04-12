@@ -43,3 +43,12 @@ other = "Create documentation issue"
 other = "Create project issue"
 [post_posts_in]
 other = "Posts in"
+
+[no_longer_maintained_message_one]
+other = "You are viewing documentation for"
+[no_longer_maintained_message_two]
+other = "version"
+[no_longer_maintained_message_three]
+other = "documentation is no longer actively maintained. The version you are currently viewing is a static snapshot. For up-to-date documentation, see the"
+[no_longer_maintained_message_four]
+other = "latest version"

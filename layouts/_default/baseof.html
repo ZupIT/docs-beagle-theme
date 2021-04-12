@@ -14,10 +14,22 @@
           <div class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
             {{ partial "sidebar.html" . }}
           </div>
+
           <div class="d-none d-xl-block col-xl-2 td-toc d-print-none">
             {{ partial "toc.html" . }}
           </div>
+          
           <main class="col-12 col-md-9 col-xl-8 pl-md-5" role="main">
+            {{ if .Site.Params.isDocumentationDeprecated}}
+            <div class="alert alert-warning" role="alert">
+              <h4 class="alert-heading">{{ T "no_longer_maintained_message_one" }} {{.Site.Title}} {{ T "no_longer_maintained_message_two" }}: v{{.Site.Params.current_version}}</h4>
+
+              <hr>
+
+              <p>{{.Site.Title}} v{{.Site.Params.current_version}} {{ T "no_longer_maintained_message_three" }} <a href="{{.Site.BaseURL}}" style="text-decoration: underline;">{{ T "no_longer_maintained_message_four" }}</a>.</p>
+            </div>
+            {{end}}
+
             {{ if not .Site.Params.ui.breadcrumb_disable }}{{ partial "breadcrumb.html" . }}{{ end }}
             {{ block "main" . }}{{ end }}
           </main>

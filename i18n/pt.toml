@@ -1,5 +1,6 @@
 
 
+
 # UI strings. Buttons and similar.
 
 [ui_pager_prev]
@@ -43,3 +44,12 @@ other = "Relatar um problema no projeto"
 other = "Posts em"
 [post_create_child_page]
 other = "Criar página filha"
+
+[no_longer_maintained_message_one]
+other = "Você está vendo a documentação da"
+[no_longer_maintained_message_two]
+other = "versão"
+[no_longer_maintained_message_three]
+other = "ela não é mais mantida ativamente. A versão que você está visualizando atualmente é um instantâneo estático. Para documentação atualizada, consulte a"
+[no_longer_maintained_message_four]
+other = "última versão"
