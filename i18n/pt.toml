@@ -50,6 +50,6 @@ other = "Você está vendo a documentação da"
 [no_longer_maintained_message_two]
 other = "versão"
 [no_longer_maintained_message_three]
-other = "ela não é mais mantida ativamente. A versão que você está visualizando atualmente é um instantâneo estático. Para documentação atualizada, consulte a"
+other = "não é mais mantida ativamente. A versão documentada que você está visualizando pode conter funcionalidades depreciadas. Para obter as funcionalidades mais recentes, consulte a nossa"
 [no_longer_maintained_message_four]
 other = "última versão"
