@@ -1,188 +1,202 @@
 // Adapted from code by Matt Walters https://www.mattwalters.net/posts/hugo-and-lunr/
 
 (function ($) {
-    'use strict';
+  'use strict';
 
-    $(document).ready(function () {
-        const $searchInput = $('.td-search-input');
+  $(document).ready(function () {
+      const CURRENT_LANGUAGE = $('html').attr('lang');
+      const $searchInput = $('.td-search-input');
 
-        //
-        // Options for popover
-        //
+      const handleSearch = (event) => {
+        render($(event.target));
 
-        $searchInput.data('html', true);
-        $searchInput.data('placement', 'bottom');
-        $searchInput.data(
-            'template',
-            '<div class="popover offline-search-result" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>'
-        );
+          // Hide keyboard on mobile browser
+        $searchInput.blur();
+      }
 
-        //
-        // Register handler
-        //
+      //
+      // Options for popover
+      //
 
-        $searchInput.on('change', (event) => {
-            render($(event.target));
+      $searchInput.data('html', true);
+      $searchInput.data('placement', 'bottom');
+      $searchInput.data(
+          'template',
+          '<div class="popover offline-search-result" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>'
+      );
 
-            // Hide keyboard on mobile browser
-            $searchInput.blur();
-        });
+      //
+      // Register handler
+      //
 
-        // Prevent reloading page by enter key on sidebar search.
-        $searchInput.closest('form').on('submit', () => {
-            return false;
-        });
+      $searchInput.on('change', handleSearch);
+      $searchInput.keyup(_.debounce(handleSearch , 500));
 
-        //
-        // Lunr
-        //
+      // Prevent reloading page by enter key on sidebar search.
+      $searchInput.closest('form').on('submit', () => {
+          return false;
+      });
 
-        let idx = null; // Lunr index
-        const resultDetails = new Map(); // Will hold the data for the search results (titles and summaries)
+      //
+      // Lunr
+      //
 
-        // Set up for an Ajax call to request the JSON data file that is created by Hugo's build process
-        $.ajax($searchInput.data('offline-search-index-json-src')).then(
-            (data) => {
-                idx = lunr(function () {
-                    this.ref('ref');
-                    this.field('title', { boost: 2 });
-                    this.field('body');
+      let idx = null; // Lunr index
+      const resultDetails = new Map(); // Will hold the data for the search results (titles and summaries)
 
-                    data.forEach((doc) => {
-                        this.add(doc);
+      // Set up for an Ajax call to request the JSON data file that is created by Hugo's build process
+      $.ajax($searchInput.data('offline-search-index-json-src')).then(
+          (data) => {
+              idx = lunr(function () {
+                  this.ref('ref');
+                  this.field('title', { boost: 2 });
+                  this.field('body');
+                  this.field('language');
 
-                        resultDetails.set(doc.ref, {
-                            title: doc.title,
-                            excerpt: doc.excerpt,
-                        });
-                    });
-                });
+                  data.forEach((doc) => {
+                      this.add(doc);
 
-                $searchInput.trigger('change');
-            }
-        );
+                      resultDetails.set(doc.ref, {
+                          title: doc.title,
+                          excerpt: doc.excerpt,
+                          language: doc.language,
+                      });
+                  });
+              });
 
-        const render = ($targetSearchInput) => {
-            // Dispose the previous result
-            $targetSearchInput.popover('dispose');
+              $searchInput.trigger('change');
+          }
+      );
 
-            //
-            // Search
-            //
+      const render = ($targetSearchInput) => {
+          // Dispose the previous result
+          $targetSearchInput.popover('dispose');
 
-            if (idx === null) {
-                return;
-            }
+          //
+          // Search
+          //
 
-            const searchQuery = $targetSearchInput.val();
-            if (searchQuery === '') {
-                return;
-            }
+          if (idx === null) {
+              return;
+          }
 
-            const results = idx
-                .query((q) => {
-                    const tokens = lunr.tokenizer(searchQuery.toLowerCase());
-                    tokens.forEach((token) => {
-                        const queryString = token.toString();
-                        q.term(queryString, {
-                            boost: 100,
-                        });
-                        q.term(queryString, {
-                            wildcard:
-                                lunr.Query.wildcard.LEADING |
-                                lunr.Query.wildcard.TRAILING,
-                            boost: 10,
-                        });
-                        q.term(queryString, {
-                            editDistance: 2,
-                        });
-                    });
-                })
-                .slice(
-                    0,
-                    $targetSearchInput.data('offline-search-max-results')
-                );
+          const searchQuery = $targetSearchInput.val();
+          if (searchQuery === '') {
+              return;
+          }
 
-            //
-            // Make result html
-            //
+          const results = idx
+              .query((q) => {
+                  console.log('1Q:', q);
 
-            const $html = $('<div>');
+                  const tokens = lunr.tokenizer(searchQuery.toLowerCase());
 
-            $html.append(
-                $('<div>')
-                    .css({
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        marginBottom: '1em',
-                    })
-                    .append(
-                        $('<span>')
-                            .text('Search results')
-                            .css({ fontWeight: 'bold' })
-                    )
-                    .append(
-                        $('<i>')
-                            .addClass('fas fa-times search-result-close-button')
-                            .css({
-                                cursor: 'pointer',
-                            })
-                    )
-            );
+                  tokens.forEach((token) => {
+                      const queryString = token.toString();
+                      q.term(queryString, {
+                          boost: 100,
+                      });
+                      q.term(queryString, {
+                          wildcard:
+                              lunr.Query.wildcard.LEADING |
+                              lunr.Query.wildcard.TRAILING,
+                          boost: 10,
+                      });
+                      q.term(queryString, {
+                          editDistance: 2,
+                      });
+                      q.term(`content/${CURRENT_LANGUAGE}`, {
+                        field: 'language',
+                        presence: lunr.Query.presence.REQUIRED
+                      })
+                  });
+              })
+              .slice(
+                  0,
+                  $targetSearchInput.data('offline-search-max-results')
+              );
+          
 
-            const $searchResultBody = $('<div>').css({
-                maxHeight: `calc(100vh - ${
-                    $targetSearchInput.offset().top -
-                    $(window).scrollTop() +
-                    180
-                }px)`,
-                overflowY: 'auto',
-            });
-            $html.append($searchResultBody);
+          //
+          // Make result html
+          //
 
-            if (results.length === 0) {
-                $searchResultBody.append(
-                    $('<p>').text(`No results found for query "${searchQuery}"`)
-                );
-            } else {
-                results.forEach((r) => {
-                    const doc = resultDetails.get(r.ref);
-                    const href =
-                        $searchInput.data('offline-search-base-href') +
-                        r.ref.replace(/^\//, '');
+          const $html = $('<div>');
 
-                    const $entry = $('<div>').addClass('mt-4');
+          $html.append(
+              $('<div>')
+                  .css({
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      marginBottom: '1em',
+                  })
+                  .append(
+                      $('<span>')
+                          .text('Search results')
+                          .css({ fontWeight: 'bold' })
+                  )
+                  .append(
+                      $('<i>')
+                          .addClass('fas fa-times search-result-close-button')
+                          .css({
+                              cursor: 'pointer',
+                          })
+                  )
+          );
 
-                    $entry.append(
-                        $('<small>').addClass('d-block text-muted').text(r.ref)
-                    );
+          const $searchResultBody = $('<div>').css({
+              maxHeight: `calc(100vh - ${
+                  $targetSearchInput.offset().top -
+                  $(window).scrollTop() +
+                  180
+              }px)`,
+              overflowY: 'auto',
+          });
+          $html.append($searchResultBody);
 
-                    $entry.append(
-                        $('<a>')
-                            .addClass('d-block')
-                            .css({
-                                fontSize: '1.2rem',
-                            })
-                            .attr('href', href)
-                            .text(doc.title)
-                    );
+          if (results.length === 0) {
+              $searchResultBody.append(
+                  $('<p>').text(`No results found for query "${searchQuery}"`)
+              );
+          } else {
+              results.forEach((r) => {
+                  const doc = resultDetails.get(r.ref);
+                  const href =
+                      $searchInput.data('offline-search-base-href') +
+                      r.ref.replace(/^\//, '');
 
-                    $entry.append($('<p>').text(doc.excerpt));
+                  const $entry = $('<div>').addClass('mt-4');
 
-                    $searchResultBody.append($entry);
-                });
-            }
+                  $entry.append(
+                      $('<small>').addClass('d-block text-muted').text(r.ref)
+                  );
 
-            $targetSearchInput.on('shown.bs.popover', () => {
-                $('.search-result-close-button').on('click', () => {
-                    $targetSearchInput.val('');
-                    $targetSearchInput.trigger('change');
-                });
-            });
+                  $entry.append(
+                      $('<a>')
+                          .addClass('d-block')
+                          .css({
+                              fontSize: '1.2rem',
+                          })
+                          .attr('href', href)
+                          .text(doc.title)
+                  );
 
-            $targetSearchInput
-                .data('content', $html[0].outerHTML)
-                .popover('show');
-        };
-    });
+                  $entry.append($('<p>').text(doc.excerpt));
+
+                  $searchResultBody.append($entry);
+              });
+          }
+
+          $targetSearchInput.on('shown.bs.popover', () => {
+              $('.search-result-close-button').on('click', () => {
+                  $targetSearchInput.val('');
+                  $targetSearchInput.trigger('change');
+              });
+          });
+
+          $targetSearchInput
+              .data('content', $html[0].outerHTML)
+              .popover('show');
+      };
+  });
 })(jQuery);
