@@ -26,19 +26,20 @@
           {{ if .Site.Params.isDocumentationDeprecated}}
           <div class="alert alert-warning" role="alert">
             <h4 class="alert-heading">
-              <b>⚠️ {{ T "no_longer_maintained_message_one" }} {{ T
-                "no_longer_maintained_message_two"
-                }}: v{{.Site.Params.current_version}}
+              <b>&#9888;&#65039; {{ T "no_longer_maintained_message_one" }} 
+                {{ T "no_longer_maintained_message_two" }}: 
+                v{{ .Site.Params.current_version }}
               </b>
             </h4>
             <hr>
 
-            <p>{{.Site.Title}} v{{.Site.Params.current_version}} {{ T "no_longer_maintained_message_three" }} <a
-                href="{{.Site.BaseURL}}" style="text-decoration: underline;">{{ T "no_longer_maintained_message_four"
-                }}</a>.</p>
+            <p>{{.Site.Title}} v{{.Site.Params.current_version}} {{ T "no_longer_maintained_message_three" }} 
+              <a href="{{.Site.BaseURL}}" style="text-decoration: underline;">
+                {{ T "no_longer_maintained_message_four" }}
+              </a>.
+            </p>
           </div>
           {{end}}
-
           {{ if not .Site.Params.ui.breadcrumb_disable }}{{ partial "breadcrumb.html" . }}{{ end }}
           {{ block "main" . }}{{ end }}
         </main>
