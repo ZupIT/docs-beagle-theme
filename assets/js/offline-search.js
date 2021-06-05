@@ -8,10 +8,14 @@
       const $searchInput = $('.td-search-input');
 
       const handleSearch = (event) => {
+        const WINDOW_WIDTH = $(document).width();
+
         render($(event.target));
 
           // Hide keyboard on mobile browser
-        $searchInput.blur();
+          if (WINDOW_WIDTH <= 500) {
+            $searchInput.blur();
+          }
       }
 
       //
