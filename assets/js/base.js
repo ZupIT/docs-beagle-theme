@@ -24,6 +24,16 @@ limitations under the License.
       itemsToHide.forEach((item) => {
         item.hide();
       });
+
+      const sidebarMenuSectionToggle = $('.td-sidebar-nav__section-title');
+
+      sidebarMenuSectionToggle.on('click', (e) => {
+        const isOpen = !($(e.target).parent('li').siblings('ul').children('li.collapse').hasClass('show'));
+
+        const parentMenu = $(e.target).parent('li').parent('.td-sidebar-nav__section');
+
+        isOpen ? parentMenu.addClass('ct-submenu-is-open') : parentMenu.removeClass('ct-submenu-is-open')
+      })
     });
 
     $(function() {
