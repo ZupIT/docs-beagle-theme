@@ -27,7 +27,7 @@
 <ul class="td-sidebar-nav__section pr-md-3">
   {{ if and (not (eq $sid $p.Site.Params.ui.main_slug_to_hide_primary )) (not (eq $sid $p.Site.Params.ui.main_slug_to_hide_secondary )) }}
     <li class="td-sidebar-nav__section-title">
-      <a href="#{{ $sid }}" data-toggle="collapse" data-target="#{{ $sid }}" aria-expanded="true" aria-controls="{{ $sid }}" class="align-left pl-0 pr-2{{ if not $show }} collapsed{{ end }}{{ if $active}} active{{ end }} td-sidebar-link td-sidebar-link__section">{{ $s.LinkTitle }}</a>
+      <a href="#{{ $sid }}" data-toggle="collapse" data-target="#{{ $sid }}" aria-expanded="true" aria-controls="{{ $sid }}" class="align-left pl-0 pr-2{{ if not $show }} collapsed{{ end }}{{ if $active}} active{{ end }} td-sidebar-link td-sidebar-link__section">{{ $s.LinkTitle }} {{if $p.Params.hasNewFeature}}{{.Site.Params.menu_new_feature_text}}{{end}}</a>
     </li>
   {{end}}
   <ul>
@@ -38,7 +38,7 @@
       {{ if and (.IsPage) (not .Params.nomenu) }}
       {{ $mid := printf "m-%s" (.RelPermalink | anchorize) }}
       {{ $active := eq . $p }}
-      <a class="td-sidebar-link td-sidebar-link__page {{ if and (not $shouldDelayActive) $active }} active{{ end }}" id="{{ $mid }}" href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
+      <a class="td-sidebar-link td-sidebar-link__page {{ if and (not $shouldDelayActive) $active }} active{{ end }}" id="{{ $mid }}" href="{{ .RelPermalink }}">{{ .LinkTitle }} {{if .Params.hasNewFeature}}{{.Site.Params.menu_new_feature_text}}{{end}}</a>
       {{ else if not .Params.toc_hide }}
       {{ template "section-tree-nav-section" (dict "page" $p "section" .) }}
       {{ end }}

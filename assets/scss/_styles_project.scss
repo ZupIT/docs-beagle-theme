@@ -128,3 +128,12 @@ pre {
   font-size: 14px;
   line-height: 1.4em;
 }
+
+.ct-submenu-is-open {
+  transition: all 0.3s ease-in-out;
+
+  background: rgba(255, 166, 48, 0.2);
+  border-radius: 5px;
+  padding: 10px 20px !important;
+  margin: 15px 0 15px -20px  !important;
+}
